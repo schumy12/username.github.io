@@ -23,10 +23,10 @@
 
     <script>
         function checkWord() {
-            const input = document.getElementById('textInput').value.trim();
+            const input = document.getElementById('textInput').value.trim().toLowerCase();
             const resultDiv = document.getElementById('result');
 
-            if (input === 'GIORNALE' || input === 'giornale') {
+            if (input === 'giornale') {
                 resultDiv.textContent = 'CORRETTO!';
                 resultDiv.style.color = 'green';
             } else {
