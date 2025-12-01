@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Riproduci Audio</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 12px 25px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Referto n°1: Messaggio vocale fra Claudia neri e Garbier Armar:</h1>
+
+    <!-- Pulsante -->
+    <button onclick="playSound()">▶ Avvia Audio</button>
+
+    <!-- Player invisibile -->
+    <audio id="sound" src="Dialogo G-Claudia.wav"></audio>
+
+    <script>
+        function playSound() {
+            const audio = document.getElementById("sound");
+            audio.currentTime = 0; // riparte da inizio se era già avviato
+            audio.play();
+        }
+    </script>
+
+</body>
+</html>
