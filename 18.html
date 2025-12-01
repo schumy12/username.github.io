@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Riproduci Audio</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 12px 25px;
+            cursor: pointer;
+        }
+        img {
+            max-width: 100%;  /* si adatta allo schermo */
+            height: auto;     /* mantiene le proporzioni */
+            display: block;   /* evita spazi indesiderati */
+            margin: 0 auto;   /* centra l'immagine */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Referto n°3: Messaggio vocale fra Gabriel Armar e Marco Del Vento:</h1>
+
+    <!-- Pulsante -->
+    <button onclick="playSound()">▶ Avvia Audio</button>
+
+    <!-- Player invisibile -->
+    <audio id="sound" src="download.wav"></audio>
+
+    <script>
+        function playSound() {
+            const audio = document.getElementById("sound");
+            audio.currentTime = 0; // riparte da inizio se era già avviato
+            audio.play();
+        }
+    </script>
+      <h1>Referto n°3: Messaggio vocale fra Gabriel Armar e Marco Del Vento:</h1>
+
+    <!-- Pulsante -->
+    <button onclick="playSound1()">▶ Avvia Audio</button>
+
+    <!-- Player invisibile -->
+    <audio id="sound1" src="download1.wav"></audio>
+
+    <script>
+        function playSound1() {
+            const audio = document.getElementById("sound1");
+            audio.currentTime = 0; // riparte da inizio se era già avviato
+            audio.play();
+        }
+    </script>
+
+        <h2>Referto n°4: Screenshot chat fra Celia Argeri e Gabriel Armar</h2>
+
+    <img src="https://i.imgur.com/tFxKfbh.png" alt="">
+    
+</body>
+</html>
+
+
+
+
+</body>
