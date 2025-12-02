@@ -1,432 +1,345 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Impiccato con numeri</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+<meta charset="UTF-8">
+<title>Impiccato con Numeri</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      margin: 0;
-      padding: 0;
-      background: #f3f4f6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+<style>
+:root{
+  font-family: system-ui, sans-serif;
+}
 
-    .game-container {
-      background: #ffffff;
-      max-width: 600px;
-      width: 100%;
-      margin: 16px;
-      padding: 20px 16px 24px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+body{
+  background:#f3f4f6;
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
-    h1 {
-      font-size: 1.4rem;
-      text-align: center;
-      margin: 0 0 4px;
-    }
+.game-container{
+  max-width:600px;
+  width:100%;
+  margin:16px;
+  padding:20px;
+  background:white;
+  border-radius:16px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
 
-    .subtitle {
-      font-size: 0.85rem;
-      text-align: center;
-      color: #6b7280;
-      margin-bottom: 8px;
-    }
+h1{
+  margin:0;
+  text-align:center;
+  font-size:1.4rem;
+}
 
-    .status-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      flex-wrap: wrap;
-    }
+.subtitle{
+  text-align:center;
+  color:#6b7280;
+  font-size:.85rem;
+}
 
-    .attempts {
-      font-weight: 600;
-    }
+/* --- DISPLAY PAROLA --- */
+.word-display{
+  font-size:1.7rem;
+  letter-spacing:0.2em;
+  text-align:center;
+  min-height:2.4em;
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:12px 10px;
+  white-space:pre-wrap;
+}
 
-    .attempts span {
-      font-weight: 700;
-    }
+/* --- STATUS --- */
+.status{
+  display:flex;
+  justify-content:space-between;
+  font-size:.9rem;
+  flex-wrap:wrap;
+}
 
-    .message {
-      text-align: right;
-      min-height: 1.2em;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
+.attempts span{
+  font-weight:800;
+}
 
-    .message.win {
-      color: #16a34a;
-    }
+/* --- TASTIERA --- */
+.keyboard{
+  display:grid;
+  grid-template-columns: repeat(9,1fr);
+  gap:5px;
+}
 
-    .message.lose {
-      color: #dc2626;
-    }
+@media(max-width:480px){
+  .keyboard{
+    grid-template-columns:repeat(7,1fr);
+  }
+}
 
-    .word-display {
-      font-size: 1.6rem;
-      letter-spacing: 0.18em;
-      text-align: center;
-      padding: 10px 8px;
-      border-radius: 12px;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      min-height: 2.4em;
-      word-wrap: break-word;
-    }
+.key-btn{
+  border:1px solid #e5e7eb;
+  background:#f9fafb;
+  border-radius:8px;
+  padding:7px 0;
+  font-weight:700;
+  cursor:pointer;
+}
 
-    .hint {
-      font-size: 0.8rem;
-      text-align: center;
-      color: #9ca3af;
-      margin-top: -6px;
-      margin-bottom: 4px;
-    }
+.key-btn:hover:not(:disabled){
+  background:#eef2ff;
+}
 
-    .keyboard {
-      display: grid;
-      grid-template-columns: repeat(9, minmax(0, 1fr));
-      gap: 4px;
-      margin-top: 6px;
-    }
+.key-btn:active:not(:disabled){
+  transform:translateY(1px);
+}
 
-    @media (max-width: 480px) {
-      .keyboard {
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-      }
-    }
+.key-btn:disabled{
+  opacity:0.6;
+  cursor:default;
+}
 
-    .key-btn {
-      padding: 6px 0;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
-      touch-action: manipulation;
-      user-select: none;
-    }
+.key-correct{
+  background:#dcfce7!important;
+  border-color:#22c55e!important;
+}
 
-    .key-btn:active:not(:disabled) {
-      transform: translateY(1px);
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
-    }
+.key-wrong{
+  background:#fee2e2!important;
+  border-color:#ef4444!important;
+}
 
-    .key-btn:hover:not(:disabled) {
-      background: #eef2ff;
-    }
+/* --- FOOTER --- */
+.bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:.85rem;
+  gap:8px;
+  flex-wrap:wrap;
+}
 
-    .key-btn:disabled {
-      cursor: default;
-      opacity: 0.7;
-    }
+.used{
+  flex:1;
+  color:#6b7280;
+}
 
-    .key-correct {
-      background: #dcfce7 !important;
-      border-color: #16a34a !important;
-    }
+.reset{
+  background:#4f46e5;
+  border:none;
+  border-radius:999px;
+  padding:6px 12px;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
 
-    .key-wrong {
-      background: #fee2e2 !important;
-      border-color: #dc2626 !important;
-    }
+.reset:hover{
+  background:#4338ca;
+}
 
-    .bottom-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
+/* --- RISULTATO --- */
+.message{
+  text-align:center;
+  font-weight:800;
+  min-height:1.3em;
+}
+.win{
+  color:#16a34a;
+}
+.lose{
+  color:#dc2626;
+}
 
-    .used-letters {
-      font-size: 0.8rem;
-      color: #6b7280;
-      flex: 1;
-      min-height: 1.4em;
-    }
-
-    .btn-reset {
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: none;
-      background: #4f46e5;
-      color: white;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
-    }
-
-    .btn-reset:hover {
-      background: #4338ca;
-      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
-    }
-
-    .btn-reset:active {
-      transform: translateY(1px);
-      box-shadow: none;
-    }
-
-    .hangman-bar {
-      font-size: 0.9rem;
-      text-align: center;
-      color: #4b5563;
-    }
-  </style>
+</style>
 </head>
 <body>
-  <div class="game-container">
-    <h1>Impiccato (con numeri)</h1>
-    <div class="subtitle">Indovina la parola: lettere A-Z e numeri 0-9 sono validi!</div>
 
-    <div class="status-row">
-      <div class="attempts">Tentativi rimasti: <span id="attempts-value"></span></div>
-      <div class="hangman-bar" id="hangman-bar"></div>
-    </div>
-
-    <div class="word-display" id="word-display"></div>
-    <div class="hint">Suggerimento: premi i tasti o usa la tastiera qui sotto</div>
-
-    <div class="keyboard" id="keyboard"></div>
-
-    <div class="bottom-row">
-      <div class="used-letters" id="used-letters"></div>
-      <button class="btn-reset" id="reset-btn">Nuova parola</button>
-    </div>
-
-    <div class="message" id="message"></div>
+<div class="game-container">
+  <h1>IMPIC CATO (con numeri)</h1>
+  <div class="subtitle">
+    Indovina lettere e numeri da tastiera o touch
   </div>
 
-  <script>
-    // ==============================
-    //   CONFIGURAZIONE DEL GIOCO
-    // ==============================
-    const WORDS = [
-      "incontriamoci alla gioielleria il 30/11 alle 22:00, firmato A.N.",
-    ];
-    const MAX_ATTEMPTS = 7;
+  <div class="status">
+     <div class="attempts">Tentativi rimasti: <span id="attempts"></span></div>
+     <div id="emojiStage">🙂</div>
+  </div>
 
-    const ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  <div id="word" class="word-display"></div>
 
-    // ==============================
-    //   VARIABILI DI STATO
-    // ==============================
-    let secretWord = "";
-    let displayedChars = [];
-    let attemptsLeft = MAX_ATTEMPTS;
-    let usedChars = new Set();
-    let gameOver = false;
+  <div class="keyboard" id="keyboard"></div>
 
-    // ==============================
-    //   RIFERIMENTI DOM
-    // ==============================
-    const attemptsValueEl = document.getElementById("attempts-value");
-    const wordDisplayEl = document.getElementById("word-display");
-    const usedLettersEl = document.getElementById("used-letters");
-    const keyboardEl = document.getElementById("keyboard");
-    const messageEl = document.getElementById("message");
-    const resetBtn = document.getElementById("reset-btn");
-    const hangmanBarEl = document.getElementById("hangman-bar");
+  <div class="bottom">
+     <div id="used" class="used"></div>
+     <button id="reset" class="reset">Nuova parola</button>
+  </div>
 
-    // ==============================
-    //   INIZIALIZZAZIONE TASTIERA
-    // ==============================
-    function createKeyboard() {
-      keyboardEl.innerHTML = "";
-      for (const c of ALLOWED_CHARS) {
-        const btn = document.createElement("button");
-        btn.className = "key-btn";
-        btn.textContent = c;
-        btn.dataset.char = c;
-        btn.addEventListener("click", () => handleGuess(c));
-        keyboardEl.appendChild(btn);
-      }
+  <div id="message" class="message"></div>
+</div>
+
+<script>
+
+/* ============================
+    CONFIGURAZIONE
+===============================*/
+
+const WORDS = [
+  "incontriamoci alla gioielleria il 30/11 alle 22:00, firmato A.N.",
+];
+
+const MAX_ATTEMPTS = 7;
+const ALLOWED = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+/* ============================
+    VARIABILI
+===============================*/
+
+let secret="";
+let visible=[];
+let attempts=MAX_ATTEMPTS;
+let used=new Set();
+let ended=false;
+
+/* ============================
+    DOM
+===============================*/
+
+const attemptsEl = document.getElementById("attempts");
+const wordEl = document.getElementById("word");
+const keyboard = document.getElementById("keyboard");
+const usedEl = document.getElementById("used");
+const resetBtn = document.getElementById("reset");
+const message = document.getElementById("message");
+const emoji = document.getElementById("emojiStage");
+
+/* ============================
+    TASTIERA
+===============================*/
+
+function buildKeyboard(){
+  keyboard.innerHTML="";
+  for(const c of ALLOWED){
+    const b=document.createElement("button");
+    b.className="key-btn";
+    b.textContent=c;
+    b.onclick=()=>guess(c);
+    keyboard.appendChild(b);
+  }
+}
+
+function markKey(c, ok){
+  const k=[...keyboard.children].find(b=>b.textContent===c);
+  if(!k) return;
+  k.disabled=true;
+  k.classList.add(ok?"key-correct":"key-wrong");
+}
+
+/* ============================
+    AVVIO PARTITA
+===============================*/
+
+function newGame(){
+  secret = WORDS[Math.floor(Math.random()*WORDS.length)].toUpperCase();
+  visible=[];
+  for(const c of secret){
+    if(c===" ") visible.push(" ");
+    else if(/[A-Z0-9]/.test(c)) visible.push("_");
+    else visible.push(c);
+  }
+
+  attempts=MAX_ATTEMPTS;
+  used.clear();
+  ended=false;
+
+  buildKeyboard();
+  updateAll();
+
+  message.textContent="";
+  message.className="message";
+}
+
+/* ============================
+    UI
+===============================*/
+
+function updateAll(){
+  wordEl.textContent =
+    visible
+      .map(c=> c===" " ? "        " : c)
+      .join(" ");
+
+  attemptsEl.textContent=attempts;
+
+  usedEl.textContent="Usati: " + (used.size ? [...used].join(" ") : "—");
+
+  emoji.textContent = ["💀","😨","😟","😐","🙂","😄","😎"][attempts-1];
+}
+
+/* ============================
+    LOGICA
+===============================*/
+
+function guess(c){
+
+  if(ended || used.has(c)) return;
+
+  used.add(c);
+  let ok=false;
+
+  for(let i=0;i<secret.length;i++){
+    if(secret[i]===c){
+      visible[i]=c;
+      ok=true;
     }
+  }
 
-    function setKeyboardEnabled(enabled) {
-      const buttons = keyboardEl.querySelectorAll(".key-btn");
-      buttons.forEach(btn => {
-        btn.disabled = !enabled || usedChars.has(btn.dataset.char);
-      });
-    }
+  if(!ok) attempts--;
 
-    function markKey(char, correct) {
-      const btn = keyboardEl.querySelector(`.key-btn[data-char="${char}"]`);
-      if (!btn) return;
-      btn.disabled = true;
-      if (correct) {
-        btn.classList.add("key-correct");
-      } else {
-        btn.classList.add("key-wrong");
-      }
-    }
+  markKey(c, ok);
+  updateAll();
 
-    // ==============================
-    //   LOGICA DI GIOCO
-    // ==============================
-    function pickRandomWord() {
-      const index = Math.floor(Math.random() * WORDS.length);
-      return WORDS[index].toUpperCase();
-    }
+  if(!visible.includes("_")){
+    ended=true;
+    message.textContent="HAI VINTO! 🎉";
+    message.classList.add("win");
+  }
+  else if(attempts<=0){
+    ended=true;
+    visible=[...secret];
+    updateAll();
+    message.textContent="PERSO 😭 — Era: "+secret;
+    message.classList.add("lose");
+  }
+}
 
-    function startGame() {
-      secretWord = pickRandomWord();
-      displayedChars = [];
+/* ============================
+    INPUT FISICO
+===============================*/
 
-      for (const ch of secretWord) {
-        if (ch === " ") {
-          displayedChars.push(" ");
-        } else if (!/^[A-Z0-9]$/.test(ch)) {
-          // Qualsiasi simbolo non alfanumerico (es. - , .) viene mostrato subito
-          displayedChars.push(ch);
-        } else {
-          displayedChars.push("_");
-        }
-      }
+window.addEventListener("keydown", e=>{
+  const k=e.key.toUpperCase();
+  if(ALLOWED.includes(k)){
+    'preventDefault' in e && e.preventDefault();
+    guess(k);
+  }
+});
 
-      attemptsLeft = MAX_ATTEMPTS;
-      usedChars.clear();
-      gameOver = false;
-      messageEl.textContent = "";
-      messageEl.className = "message";
+resetBtn.onclick=newGame;
 
-      updateDisplay();
-      updateUsedLetters();
-      updateHangmanBar();
-      resetKeyboardStyles();
-      setKeyboardEnabled(true);
-    }
+/* ============================
+    START
+===============================*/
 
-    function resetKeyboardStyles() {
-      const buttons = keyboardEl.querySelectorAll(".key-btn");
-      buttons.forEach(btn => {
-        btn.disabled = false;
-        btn.classList.remove("key-correct", "key-wrong");
-      });
-    }
+buildKeyboard();
+newGame();
 
-    function updateDisplay() {
-      wordDisplayEl.textContent = displayedChars
-  .map(c => (c === " " ? "     " : c))
-  .join(" ");
-      attemptsValueEl.textContent = attemptsLeft.toString();
-    }
+</script>
 
-    function updateUsedLetters() {
-      if (usedChars.size === 0) {
-        usedLettersEl.textContent = "Lettere/numeri usati: —";
-        return;
-      }
-      const arr = Array.from(usedChars).sort();
-      usedLettersEl.textContent = "Usati: " + arr.join(" ");
-    }
-
-    function updateHangmanBar() {
-      const stages = [
-        "💀 Impiccato!",
-        "😰 Ultimo tentativo!",
-        "😟 Attento...",
-        "😐 Concentrato...",
-        "🙂 Vai tranquillo.",
-        "😄 Sei ancora al sicuro.",
-        "😎 Easy.",
-      ];
-      const index = Math.max(0, Math.min(stages.length - 1, attemptsLeft - 1));
-      hangmanBarEl.textContent = stages[index];
-    }
-
-    function checkWin() {
-      return !displayedChars.includes("_");
-    }
-
-    function endGame(win) {
-      gameOver = true;
-      setKeyboardEnabled(false);
-      if (win) {
-        messageEl.textContent = "Hai vinto! 🎉";
-        messageEl.classList.add("win");
-      } else {
-        messageEl.textContent = `Hai perso! La parola era: "${secretWord}"`;
-        messageEl.classList.add("lose");
-        // Mostra la parola completa
-        displayedChars = secretWord.split("");
-        updateDisplay();
-      }
-    }
-
-    function handleGuess(rawChar) {
-      const char = rawChar.toUpperCase();
-
-      if (gameOver) return;
-      if (!/^[A-Z0-9]$/.test(char)) return;
-      if (usedChars.has(char)) return;
-
-      usedChars.add(char);
-
-      let found = false;
-      for (let i = 0; i < secretWord.length; i++) {
-        if (secretWord[i] === char && displayedChars[i] === "_") {
-          displayedChars[i] = secretWord[i];
-          found = true;
-        }
-      }
-
-      if (!found) {
-        attemptsLeft--;
-      }
-
-      markKey(char, found);
-      updateDisplay();
-      updateUsedLetters();
-      updateHangmanBar();
-
-      if (checkWin()) {
-        endGame(true);
-      } else if (attemptsLeft <= 0) {
-        endGame(false);
-      }
-    }
-
-    // ==============================
-    //   EVENTI GLOBALI
-    // ==============================
-    // Tastiera fisica (PC / tablet con tastiera)
-    window.addEventListener("keydown", (e) => {
-      const key = e.key.toUpperCase();
-      if (/^[A-Z0-9]$/.test(key)) {
-        e.preventDefault();
-        handleGuess(key);
-      }
-    });
-
-    resetBtn.addEventListener("click", () => {
-      startGame();
-    });
-
-    // ==============================
-    //   AVVIO
-    // ==============================
-    createKeyboard();
-    startGame();
-  </script>
 </body>
 </html>
