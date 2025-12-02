@@ -325,7 +325,9 @@
     }
 
     function updateDisplay() {
-      wordDisplayEl.textContent = displayedChars.join(" ");
+      wordDisplayEl.textContent = displayedChars
+  .map(c => (c === " " ? "     " : c))
+  .join(" ");
       attemptsValueEl.textContent = attemptsLeft.toString();
     }
 
