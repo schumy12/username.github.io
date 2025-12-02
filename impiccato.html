@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Impiccato con numeri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .game-container {
+      background: #ffffff;
+      max-width: 600px;
+      width: 100%;
+      margin: 16px;
+      padding: 20px 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      text-align: center;
+      margin: 0 0 4px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .attempts {
+      font-weight: 600;
+    }
+
+    .attempts span {
+      font-weight: 700;
+    }
+
+    .message {
+      text-align: right;
+      min-height: 1.2em;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .message.win {
+      color: #16a34a;
+    }
+
+    .message.lose {
+      color: #dc2626;
+    }
+
+    .word-display {
+      font-size: 1.6rem;
+      letter-spacing: 0.18em;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      min-height: 2.4em;
+      word-wrap: break-word;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      text-align: center;
+      color: #9ca3af;
+      margin-top: -6px;
+      margin-bottom: 4px;
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 480px) {
+      .keyboard {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+      }
+    }
+
+    .key-btn {
+      padding: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .key-btn:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+    }
+
+    .key-btn:hover:not(:disabled) {
+      background: #eef2ff;
+    }
+
+    .key-btn:disabled {
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    .key-correct {
+      background: #dcfce7 !important;
+      border-color: #16a34a !important;
+    }
+
+    .key-wrong {
+      background: #fee2e2 !important;
+      border-color: #dc2626 !important;
+    }
+
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .used-letters {
+      font-size: 0.8rem;
+      color: #6b7280;
+      flex: 1;
+      min-height: 1.4em;
+    }
+
+    .btn-reset {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+    }
+
+    .btn-reset:hover {
+      background: #4338ca;
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn-reset:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    .hangman-bar {
+      font-size: 0.9rem;
+      text-align: center;
+      color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Impiccato (con numeri)</h1>
+    <div class="subtitle">Indovina la parola: lettere A-Z e numeri 0-9 sono validi!</div>
+
+    <div class="status-row">
+      <div class="attempts">Tentativi rimasti: <span id="attempts-value"></span></div>
+      <div class="hangman-bar" id="hangman-bar"></div>
+    </div>
+
+    <div class="word-display" id="word-display"></div>
+    <div class="hint">Suggerimento: premi i tasti o usa la tastiera qui sotto</div>
+
+    <div class="keyboard" id="keyboard"></div>
+
+    <div class="bottom-row">
+      <div class="used-letters" id="used-letters"></div>
+      <button class="btn-reset" id="reset-btn">Nuova parola</button>
+    </div>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    // ==============================
+    //   CONFIGURAZIONE DEL GIOCO
+    // ==============================
+    const WORDS = [
+      "incontriamoci alla gioielleria il 30/11 alle 22:00, firmato A.N.",
+    ];
+    const MAX_ATTEMPTS = 7;
+
+    const ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    // ==============================
+    //   VARIABILI DI STATO
+    // ==============================
+    let secretWord = "";
+    let displayedChars = [];
+    let attemptsLeft = MAX_ATTEMPTS;
+    let usedChars = new Set();
+    let gameOver = false;
+
+    // ==============================
+    //   RIFERIMENTI DOM
+    // ==============================
+    const attemptsValueEl = document.getElementById("attempts-value");
+    const wordDisplayEl = document.getElementById("word-display");
+    const usedLettersEl = document.getElementById("used-letters");
+    const keyboardEl = document.getElementById("keyboard");
+    const messageEl = document.getElementById("message");
+    const resetBtn = document.getElementById("reset-btn");
+    const hangmanBarEl = document.getElementById("hangman-bar");
+
+    // ==============================
+    //   INIZIALIZZAZIONE TASTIERA
+    // ==============================
+    function createKeyboard() {
+      keyboardEl.innerHTML = "";
+      for (const c of ALLOWED_CHARS) {
+        const btn = document.createElement("button");
+        btn.className = "key-btn";
+        btn.textContent = c;
+        btn.dataset.char = c;
+        btn.addEventListener("click", () => handleGuess(c));
+        keyboardEl.appendChild(btn);
+      }
+    }
+
+    function setKeyboardEnabled(enabled) {
+      const buttons = keyboardEl.querySelectorAll(".key-btn");
+      buttons.forEach(btn => {
+        btn.disabled = !enabled || usedChars.has(btn.dataset.char);
+      });
+    }
+
+    function markKey(char, correct) {
+      const btn = keyboardEl.querySelector(`.key-btn[data-char="${char}"]`);
+      if (!btn) return;
+      btn.disabled = true;
+      if (correct) {
+        btn.classList.add("key-correct");
+      } else {
+        btn.classList.add("key-wrong");
+      }
+    }
+
+    // ==============================
+    //   LOGICA DI GIOCO
+    // ==============================
+    function pickRandomWord() {
+      const index = Math.floor(Math.random() * WORDS.length);
+      return WORDS[index].toUpperCase();
+    }
+
+    function startGame() {
+      secretWord = pickRandomWord();
+      displayedChars = [];
+
+      for (const ch of secretWord) {
+        if (ch === " ") {
+          displayedChars.push(" ");
+        } else if (!/^[A-Z0-9]$/.test(ch)) {
+          // Qualsiasi simbolo non alfanumerico (es. - , .) viene mostrato subito
+          displayedChars.push(ch);
+        } else {
+          displayedChars.push("_");
+        }
+      }
+
+      attemptsLeft = MAX_ATTEMPTS;
+      usedChars.clear();
+      gameOver = false;
+      messageEl.textContent = "";
+      messageEl.className = "message";
+
+      updateDisplay();
+      updateUsedLetters();
+      updateHangmanBar();
+      resetKeyboardStyles();
+      setKeyboardEnabled(true);
+    }
+
+    function resetKeyboardStyles() {
+      const buttons = keyboardEl.querySelectorAll(".key-btn");
+      buttons.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove("key-correct", "key-wrong");
+      });
+    }
+
+    function updateDisplay() {
+      wordDisplayEl.textContent = displayedChars.join(" ");
+      attemptsValueEl.textContent = attemptsLeft.toString();
+    }
+
+    function updateUsedLetters() {
+      if (usedChars.size === 0) {
+        usedLettersEl.textContent = "Lettere/numeri usati: —";
+        return;
+      }
+      const arr = Array.from(usedChars).sort();
+      usedLettersEl.textContent = "Usati: " + arr.join(" ");
+    }
+
+    function updateHangmanBar() {
+      const stages = [
+        "💀 Impiccato!",
+        "😰 Ultimo tentativo!",
+        "😟 Attento...",
+        "😐 Concentrato...",
+        "🙂 Vai tranquillo.",
+        "😄 Sei ancora al sicuro.",
+        "😎 Easy.",
+      ];
+      const index = Math.max(0, Math.min(stages.length - 1, attemptsLeft - 1));
+      hangmanBarEl.textContent = stages[index];
+    }
+
+    function checkWin() {
+      return !displayedChars.includes("_");
+    }
+
+    function endGame(win) {
+      gameOver = true;
+      setKeyboardEnabled(false);
+      if (win) {
+        messageEl.textContent = "Hai vinto! 🎉";
+        messageEl.classList.add("win");
+      } else {
+        messageEl.textContent = `Hai perso! La parola era: "${secretWord}"`;
+        messageEl.classList.add("lose");
+        // Mostra la parola completa
+        displayedChars = secretWord.split("");
+        updateDisplay();
+      }
+    }
+
+    function handleGuess(rawChar) {
+      const char = rawChar.toUpperCase();
+
+      if (gameOver) return;
+      if (!/^[A-Z0-9]$/.test(char)) return;
+      if (usedChars.has(char)) return;
+
+      usedChars.add(char);
+
+      let found = false;
+      for (let i = 0; i < secretWord.length; i++) {
+        if (secretWord[i] === char && displayedChars[i] === "_") {
+          displayedChars[i] = secretWord[i];
+          found = true;
+        }
+      }
+
+      if (!found) {
+        attemptsLeft--;
+      }
+
+      markKey(char, found);
+      updateDisplay();
+      updateUsedLetters();
+      updateHangmanBar();
+
+      if (checkWin()) {
+        endGame(true);
+      } else if (attemptsLeft <= 0) {
+        endGame(false);
+      }
+    }
+
+    // ==============================
+    //   EVENTI GLOBALI
+    // ==============================
+    // Tastiera fisica (PC / tablet con tastiera)
+    window.addEventListener("keydown", (e) => {
+      const key = e.key.toUpperCase();
+      if (/^[A-Z0-9]$/.test(key)) {
+        e.preventDefault();
+        handleGuess(key);
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      startGame();
+    });
+
+    // ==============================
+    //   AVVIO
+    // ==============================
+    createKeyboard();
+    startGame();
+  </script>
+</body>
+</html>
