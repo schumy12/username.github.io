@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Impiccato con Numeri</title>
+<title>Impiccato Smart</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -26,7 +26,7 @@ body{
   padding:20px;
   background:white;
   border-radius:16px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
   display:flex;
   flex-direction:column;
   gap:12px;
@@ -44,24 +44,9 @@ h1{
   font-size:.85rem;
 }
 
-/* --- DISPLAY PAROLA --- */
-.word-display{
-  font-size:1.7rem;
-  letter-spacing:0.2em;
-  text-align:center;
-  min-height:2.4em;
-  background:#f9fafb;
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:12px 10px;
-  white-space:pre-wrap;
-}
-
-/* --- STATUS --- */
 .status{
   display:flex;
   justify-content:space-between;
-  font-size:.9rem;
   flex-wrap:wrap;
 }
 
@@ -69,7 +54,35 @@ h1{
   font-weight:800;
 }
 
-/* --- TASTIERA --- */
+/* -------- DISPLAY PAROLA -------- */
+
+.word-display{
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:12px 10px;
+  text-align:center;
+}
+
+.word-group{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:16px 22px;
+}
+
+.word{
+  font-size:1.7rem;
+  letter-spacing:.25em;
+  white-space:nowrap;
+}
+
+.letter{
+  margin-right:.25em;
+}
+
+/* -------- TASTIERA -------- */
+
 .keyboard{
   display:grid;
   grid-template-columns: repeat(9,1fr);
@@ -95,13 +108,8 @@ h1{
   background:#eef2ff;
 }
 
-.key-btn:active:not(:disabled){
-  transform:translateY(1px);
-}
-
 .key-btn:disabled{
-  opacity:0.6;
-  cursor:default;
+  opacity:.6;
 }
 
 .key-correct{
@@ -114,14 +122,13 @@ h1{
   border-color:#ef4444!important;
 }
 
-/* --- FOOTER --- */
+/* -------- FOOTER -------- */
+
 .bottom{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  font-size:.85rem;
-  gap:8px;
   flex-wrap:wrap;
+  font-size:.85rem;
 }
 
 .used{
@@ -143,84 +150,69 @@ h1{
   background:#4338ca;
 }
 
-/* --- RISULTATO --- */
+/* -------- ESITO -------- */
+
 .message{
+  min-height:1.3em;
   text-align:center;
   font-weight:800;
-  min-height:1.3em;
-}
-.win{
-  color:#16a34a;
-}
-.lose{
-  color:#dc2626;
 }
 
+.win{color:#16a34a;}
+.lose{color:#dc2626;}
 </style>
 </head>
 <body>
 
 <div class="game-container">
-  <h1>IMPIC CATO (con numeri)</h1>
-  <div class="subtitle">
-    Indovina lettere e numeri da tastiera o touch
-  </div>
 
-  <div class="status">
-     <div class="attempts">Tentativi rimasti: <span id="attempts"></span></div>
-     <div id="emojiStage">🙂</div>
-  </div>
+<h1>IMPICCATO</h1>
+<div class="subtitle">Lettere + numeri — parole sempre intere</div>
 
-  <div id="word" class="word-display"></div>
+<div class="status">
+  <div class="attempts">Tentativi: <span id="attempts"></span></div>
+  <div id="emoji">🙂</div>
+</div>
 
-  <div class="keyboard" id="keyboard"></div>
+<div class="word-display">
+  <div id="words" class="word-group"></div>
+</div>
 
-  <div class="bottom">
-     <div id="used" class="used"></div>
-     <button id="reset" class="reset">Nuova parola</button>
-  </div>
+<div id="keyboard" class="keyboard"></div>
 
-  <div id="message" class="message"></div>
+<div class="bottom">
+  <div id="used" class="used"></div>
+  <button id="reset" class="reset">Nuova</button>
+</div>
+
+<div id="message" class="message"></div>
+
 </div>
 
 <script>
 
-/* ============================
-    CONFIGURAZIONE
-===============================*/
-
-const WORDS = [
+const WORDS=[
   "incontriamoci alla gioielleria il 30/11 alle 22:00, firmato A.N.",
 ];
 
-const MAX_ATTEMPTS = 7;
-const ALLOWED = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-/* ============================
-    VARIABILI
-===============================*/
+const MAX_ATTEMPTS=7;
+const ALLOWED="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 let secret="";
 let visible=[];
 let attempts=MAX_ATTEMPTS;
 let used=new Set();
-let ended=false;
+let over=false;
 
-/* ============================
-    DOM
-===============================*/
+const attemptsEl=document.getElementById("attempts");
+const keyboard=document.getElementById("keyboard");
+const usedEl=document.getElementById("used");
+const resetBtn=document.getElementById("reset");
+const wordsHolder=document.getElementById("words");
+const message=document.getElementById("message");
+const emoji=document.getElementById("emoji");
 
-const attemptsEl = document.getElementById("attempts");
-const wordEl = document.getElementById("word");
-const keyboard = document.getElementById("keyboard");
-const usedEl = document.getElementById("used");
-const resetBtn = document.getElementById("reset");
-const message = document.getElementById("message");
-const emoji = document.getElementById("emojiStage");
-
-/* ============================
-    TASTIERA
-===============================*/
+/* ---- KEYBOARD ---- */
 
 function buildKeyboard(){
   keyboard.innerHTML="";
@@ -233,61 +225,62 @@ function buildKeyboard(){
   }
 }
 
-function markKey(c, ok){
+function markKey(c,ok){
   const k=[...keyboard.children].find(b=>b.textContent===c);
-  if(!k) return;
+  if(!k)return;
   k.disabled=true;
   k.classList.add(ok?"key-correct":"key-wrong");
 }
 
-/* ============================
-    AVVIO PARTITA
-===============================*/
+/* ---- GAME ---- */
 
 function newGame(){
-  secret = WORDS[Math.floor(Math.random()*WORDS.length)].toUpperCase();
+  secret=WORDS[Math.floor(Math.random()*WORDS.length)].toUpperCase();
   visible=[];
   for(const c of secret){
     if(c===" ") visible.push(" ");
     else if(/[A-Z0-9]/.test(c)) visible.push("_");
     else visible.push(c);
   }
-
   attempts=MAX_ATTEMPTS;
   used.clear();
-  ended=false;
-
+  over=false;
   buildKeyboard();
-  updateAll();
-
+  update();
   message.textContent="";
   message.className="message";
 }
 
-/* ============================
-    UI
-===============================*/
+/* ---- RENDER ---- */
 
-function updateAll(){
-  wordEl.textContent =
-    visible
-      .map(c=> c===" " ? "        " : c)
-      .join(" ");
+function update(){
+  wordsHolder.innerHTML="";
+  
+  const parts = visible.join("").split(" ");
+
+  for(const word of parts){
+    const wordSpan=document.createElement("span");
+    wordSpan.className="word";
+
+    for(const l of word){
+      const s=document.createElement("span");
+      s.className="letter";
+      s.textContent=l;
+      wordSpan.appendChild(s);
+    }
+
+    wordsHolder.appendChild(wordSpan);
+  }
 
   attemptsEl.textContent=attempts;
-
-  usedEl.textContent="Usati: " + (used.size ? [...used].join(" ") : "—");
-
-  emoji.textContent = ["💀","😨","😟","😐","🙂","😄","😎"][attempts-1];
+  usedEl.textContent="Usati: " + (used.size?[...used].join(" "):"—");
+  emoji.textContent=["💀","😨","😟","😐","🙂","😄","😎"][attempts-1];
 }
 
-/* ============================
-    LOGICA
-===============================*/
+/* ---- LOGICA ---- */
 
 function guess(c){
-
-  if(ended || used.has(c)) return;
+  if(over || used.has(c)) return;
 
   used.add(c);
   let ok=false;
@@ -301,44 +294,38 @@ function guess(c){
 
   if(!ok) attempts--;
 
-  markKey(c, ok);
-  updateAll();
+  markKey(c,ok);
+  update();
 
   if(!visible.includes("_")){
-    ended=true;
-    message.textContent="HAI VINTO! 🎉";
+    over=true;
+    message.textContent="HAI VINTO 🎉";
     message.classList.add("win");
   }
   else if(attempts<=0){
-    ended=true;
+    over=true;
     visible=[...secret];
-    updateAll();
-    message.textContent="PERSO 😭 — Era: "+secret;
+    update();
+    message.textContent="PERSO 😭 — "+secret;
     message.classList.add("lose");
   }
 }
 
-/* ============================
-    INPUT FISICO
-===============================*/
+/* ---- INPUT FISICO ---- */
 
-window.addEventListener("keydown", e=>{
+window.addEventListener("keydown",e=>{
   const k=e.key.toUpperCase();
   if(ALLOWED.includes(k)){
-    'preventDefault' in e && e.preventDefault();
+    e.preventDefault();
     guess(k);
   }
 });
 
 resetBtn.onclick=newGame;
 
-/* ============================
-    START
-===============================*/
-
+/* ---- START ---- */
 buildKeyboard();
 newGame();
-
 </script>
 
 </body>
