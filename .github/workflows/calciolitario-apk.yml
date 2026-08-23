@@ -1,0 +1,53 @@
+name: Build Calciolitario 1.0.1 APK
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: calciolitario-android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Restore Android project
+        shell: bash
+        run: unzip -q calciolitario_101_buildsrc.zip
+      - name: Build release APK
+        shell: bash
+        run: |
+          cd Calciolitario_Android
+          gradle :app:assembleRelease --stacktrace
+      - name: Bundle Android signing tools
+        shell: bash
+        run: |
+          mkdir -p signing-tools/lib
+          cp "$ANDROID_HOME/build-tools/35.0.0/apksigner" signing-tools/
+          cp "$ANDROID_HOME/build-tools/35.0.0/zipalign" signing-tools/
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" signing-tools/lib/
+          if [ -f "$ANDROID_HOME/build-tools/35.0.0/lib64/libc++.so" ]; then
+            cp "$ANDROID_HOME/build-tools/35.0.0/lib64/libc++.so" signing-tools/
+          elif [ -f "$ANDROID_HOME/emulator/lib64/libc++.so" ]; then
+            cp "$ANDROID_HOME/emulator/lib64/libc++.so" signing-tools/
+          else
+            find "$ANDROID_HOME" -name 'libc++.so' -type f -print -quit | xargs -r -I{} cp "{}" signing-tools/
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Calciolitario-1.0.1-build
+          path: |
+            Calciolitario_Android/app/build/outputs/apk/release/app-release-unsigned.apk
+            signing-tools
+          if-no-files-found: error
