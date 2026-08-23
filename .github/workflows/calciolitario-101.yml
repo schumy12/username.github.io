@@ -1,7 +1,7 @@
 name: Build Calciolitario 1.0.1 APK
 
 on:
-  pull_request:
+  push:
     branches: [ main ]
   workflow_dispatch:
 
@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: calciolitario-android
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
