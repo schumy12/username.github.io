@@ -20,13 +20,15 @@ jobs:
           d17ab489497ad69f402eb48b1ce10e4ad200d1692ed60bc278d1c2c2c9544be4  .buildsrc/part01
           3ba1c64435e4ad41c2f5ac647779f6da46b08d9590ad0532cb283ebcac0ebba7  .buildsrc/part02
           33b258fc00bbeddeeda175ab5cdf347a9af87b64b4ea302cdee286bc5d4145d0  .buildsrc/part03
-          29b086e84dccf2c9edc71e261511dc8e1c3751b2f0245bfbf997fa5c125dda2d  .buildsrc/part04
+          12569f64f3f5f657d5d40b1b52da5d269686a6fc39e99efe4304a9a170de8421  .buildsrc/part04_0
+          4c94f16712b58398e26d41030a806338ed89da59126e4724378b6620c2590bb1  .buildsrc/part04_1
+          e605183e753c9ff68b0fd3624848af5d924461412a37dedc3f04be3282b129c6  .buildsrc/part04_2
+          85dc7ea2812027e7053ec6698bc849985af9dcbf10955670725ed3e23f628ed1  .buildsrc/part04_3
           e1d9a406547959e564d5815fedadd31142568e50fc0adf7dc3ccf0c4c48c6fdd  .buildsrc/part05
           6f0cea339496dbb89b0c9f18bb6e56e2010e2dafbaf39f1ad0f371e2887e3938  .buildsrc/part06
           EOF
-          wc -c .buildsrc/part*
           sha256sum -c expected.sha
-          cat .buildsrc/part00 .buildsrc/part01 .buildsrc/part02 .buildsrc/part03 .buildsrc/part04 .buildsrc/part05 .buildsrc/part06 > buildsrc.b64
+          cat .buildsrc/part00 .buildsrc/part01 .buildsrc/part02 .buildsrc/part03 .buildsrc/part04_0 .buildsrc/part04_1 .buildsrc/part04_2 .buildsrc/part04_3 .buildsrc/part05 .buildsrc/part06 > buildsrc.b64
           base64 -d buildsrc.b64 > calciolitario_101_buildsrc_small.zip
           echo "17303d2f39d71de6cdbbb6605ab2f5aefff1bd2b3246c942a5576221428e635a  calciolitario_101_buildsrc_small.zip" | sha256sum -c -
           unzip -q calciolitario_101_buildsrc_small.zip
