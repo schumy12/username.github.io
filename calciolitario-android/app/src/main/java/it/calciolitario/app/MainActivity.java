@@ -20,9 +20,15 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+import android.util.Base64;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.zip.GZIPInputStream;
 
 public class MainActivity extends Activity {
     private static final int REQ_OPEN_FILE = 1001;
@@ -106,11 +112,45 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            webView.loadUrl("file:///android_asset/index.html");
+            try {
+                String html = loadBundledHtml();
+                webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+            } catch (Exception e) {
+                Toast.makeText(this, "Errore nel caricamento di Calciolitario", Toast.LENGTH_LONG).show();
+            }
         } else {
             webView.restoreState(savedInstanceState);
         }
         setImmersive(true);
+    }
+
+    private String readAssetText(String name) throws Exception {
+        try (InputStream in = getAssets().open(name);
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            return out.toString(StandardCharsets.UTF_8.name());
+        }
+    }
+
+    private String loadBundledHtml() throws Exception {
+        StringBuilder encoded = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            encoded.append(readAssetText(String.format(Locale.US, "html_%02d.b64", i)));
+        }
+        byte[] compressed = Base64.decode(encoded.toString(), Base64.DEFAULT);
+        try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(compressed));
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = gzip.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            return out.toString(StandardCharsets.UTF_8.name());
+        }
     }
 
     @Override
