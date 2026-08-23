@@ -1,8 +1,8 @@
 name: Build Calciolitario 1.0.1 APK
 
 on:
-  push:
-    branches: [ calciolitario-android ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: calciolitario-android
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -22,8 +24,7 @@ jobs:
           gradle-version: '8.7'
       - name: Restore Android project
         shell: bash
-        run: |
-          unzip -q calciolitario_101_buildsrc.zip
+        run: unzip -q calciolitario_101_buildsrc.zip
       - name: Build release APK
         shell: bash
         run: |
