@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
         } else {
             webView.restoreState(savedInstanceState);
         }
-        setImmersive(true);
+        applyImmersiveUi(true);
     }
 
     private String readAssetText(String name) throws Exception {
@@ -163,7 +163,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         webView.onResume();
-        if (immersive) setImmersive(true);
+        if (immersive) applyImmersiveUi(true);
     }
 
     @Override
@@ -175,10 +175,10 @@ public class MainActivity extends Activity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && immersive) setImmersive(true);
+        if (hasFocus && immersive) applyImmersiveUi(true);
     }
 
-    private void setImmersive(boolean enabled) {
+    private void applyImmersiveUi(boolean enabled) {
         immersive = enabled;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             WindowInsetsController controller = getWindow().getInsetsController();
@@ -262,7 +262,7 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void toggleFullscreen() {
-            runOnUiThread(() -> setImmersive(!immersive));
+            runOnUiThread(() -> applyImmersiveUi(!immersive));
         }
     }
 }
