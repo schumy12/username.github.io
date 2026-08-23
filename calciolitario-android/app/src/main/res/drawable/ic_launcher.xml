@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Pallone -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FF111111"
+        android:strokeWidth="4"
+        android:pathData="M54,4 C81.6,4 104,26.4 104,54 C104,81.6 81.6,104 54,104 C26.4,104 4,81.6 4,54 C4,26.4 26.4,4 54,4 Z" />
+
+    <!-- Pannelli neri -->
+    <path android:fillColor="#FF111111" android:pathData="M54,7 L65,15 L61,28 L47,28 L43,15 Z" />
+    <path android:fillColor="#FF111111" android:pathData="M18,28 L30,24 L38,35 L31,46 L17,42 Z" />
+    <path android:fillColor="#FF111111" android:pathData="M90,28 L78,24 L70,35 L77,46 L91,42 Z" />
+    <path android:fillColor="#FF111111" android:pathData="M17,68 L31,63 L39,74 L31,87 L18,81 Z" />
+    <path android:fillColor="#FF111111" android:pathData="M91,68 L77,63 L69,74 L77,87 L90,81 Z" />
+    <path android:fillColor="#FF111111" android:pathData="M43,91 L47,79 L61,79 L65,91 L54,101 Z" />
+
+    <!-- Cuciture principali -->
+    <path android:fillColor="@android:color/transparent" android:strokeColor="#FF111111" android:strokeWidth="2" android:pathData="M47,28 L38,35 M61,28 L70,35 M31,46 L35,58 M77,46 L73,58 M39,74 L45,69 M69,74 L63,69 M47,79 L45,69 M61,79 L63,69" />
+
+    <!-- Picche centrale -->
+    <path
+        android:fillColor="#FF050505"
+        android:pathData="M54,35 C49,43 39,48 39,57 C39,64 44,68 50,66 C49,72 46,76 43,80 L65,80 C62,76 59,72 58,66 C64,68 69,64 69,57 C69,48 59,43 54,35 Z" />
+</vector>
