@@ -3,6 +3,8 @@ name: Build Calciolitario 1.0.1 APK
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
