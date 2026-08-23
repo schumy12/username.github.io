@@ -12,6 +12,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: calciolitario-android
+      - name: Restore and verify Android project
+        shell: bash
+        run: |
+          cat > expected.sha <<'EOF'
+          baaded657108305eecd28694e8ee0ba2223594c8b08e932d75e4951e6b9c292f  .buildsrc/part00
+          d17ab489497ad69f402eb48b1ce10e4ad200d1692ed60bc278d1c2c2c9544be4  .buildsrc/part01
+          3ba1c64435e4ad41c2f5ac647779f6da46b08d9590ad0532cb283ebcac0ebba7  .buildsrc/part02
+          33b258fc00bbeddeeda175ab5cdf347a9af87b64b4ea302cdee286bc5d4145d0  .buildsrc/part03
+          29b086e84dccf2c9edc71e261511dc8e1c3751b2f0245bfbf997fa5c125dda2d  .buildsrc/part04
+          e1d9a406547959e564d5815fedadd31142568e50fc0adf7dc3ccf0c4c48c6fdd  .buildsrc/part05
+          6f0cea339496dbb89b0c9f18bb6e56e2010e2dafbaf39f1ad0f371e2887e3938  .buildsrc/part06
+          EOF
+          wc -c .buildsrc/part*
+          sha256sum -c expected.sha
+          cat .buildsrc/part00 .buildsrc/part01 .buildsrc/part02 .buildsrc/part03 .buildsrc/part04 .buildsrc/part05 .buildsrc/part06 > buildsrc.b64
+          base64 -d buildsrc.b64 > calciolitario_101_buildsrc_small.zip
+          echo "17303d2f39d71de6cdbbb6605ab2f5aefff1bd2b3246c942a5576221428e635a  calciolitario_101_buildsrc_small.zip" | sha256sum -c -
+          unzip -q calciolitario_101_buildsrc_small.zip
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -22,13 +40,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
-      - name: Restore Android project
-        shell: bash
-        run: |
-          cat .buildsrc/part00 .buildsrc/part01 .buildsrc/part02 .buildsrc/part03 .buildsrc/part04 .buildsrc/part05 .buildsrc/part06 > buildsrc.b64
-          base64 -d buildsrc.b64 > calciolitario_101_buildsrc_small.zip
-          echo "17303d2f39d71de6cdbbb6605ab2f5aefff1bd2b3246c942a5576221428e635a  calciolitario_101_buildsrc_small.zip" | sha256sum -c -
-          unzip -q calciolitario_101_buildsrc_small.zip
       - name: Build release APK
         shell: bash
         run: |
