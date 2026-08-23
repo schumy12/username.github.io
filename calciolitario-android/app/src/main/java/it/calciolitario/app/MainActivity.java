@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,8 +47,23 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().setDecorFitsSystemWindows(false);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            getWindow().setAttributes(params);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        }
+
         webView = new WebView(this);
         setContentView(webView);
+        webView.setBackgroundColor(Color.rgb(4, 10, 7));
+        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -121,7 +137,7 @@ public class MainActivity extends Activity {
         } else {
             webView.restoreState(savedInstanceState);
         }
-        applyImmersiveUi(true);
+        applyImmersiveMode(true);
     }
 
     private String readAssetText(String name) throws Exception {
@@ -163,7 +179,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         webView.onResume();
-        if (immersive) applyImmersiveUi(true);
+        if (immersive) applyImmersiveMode(true);
     }
 
     @Override
@@ -175,10 +191,10 @@ public class MainActivity extends Activity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && immersive) applyImmersiveUi(true);
+        if (hasFocus && immersive) applyImmersiveMode(true);
     }
 
-    private void applyImmersiveUi(boolean enabled) {
+    private void applyImmersiveMode(boolean enabled) {
         immersive = enabled;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             WindowInsetsController controller = getWindow().getInsetsController();
@@ -262,7 +278,7 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void toggleFullscreen() {
-            runOnUiThread(() -> applyImmersiveUi(!immersive));
+            runOnUiThread(() -> applyImmersiveMode(!immersive));
         }
     }
 }
